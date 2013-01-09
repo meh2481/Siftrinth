@@ -1,0 +1,10 @@
+Better portal artwork
+Sounds/music
+Finish maps
+Death/game over system
+Reset cube on cube clear and leave (and tap?)
+Tap to ignore portalmaking
+Only can connect portal going through
+
+stretch goals:
+High scores

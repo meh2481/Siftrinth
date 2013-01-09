@@ -2,6 +2,7 @@
 *.slo
 *.lo
 *.o
+*.d
 
 # Compiled Dynamic libraries
 *.so
@@ -11,3 +12,14 @@
 *.lai
 *.la
 *.a
+
+# Compiled executables
+*.elf
+
+# Art assets
+*.png
+*.svg
+
+# Generated C++ files
+*.gen.cpp
+*.gen.h
