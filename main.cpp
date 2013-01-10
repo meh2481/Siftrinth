@@ -3,28 +3,45 @@
  */
 
 #include "CubeBoard.h"
-#define NUM_CUBES	3
+#define NUM_CUBES			3
 #define TAP_PROMPT_DELAY	3.0
+#define NUM_COLORS			6
+#define NUM_STARS_CUBE		7
 
 static AssetSlot MainSlot = AssetSlot::allocate()
     .bootstrap(GameAssets);
 
 static Metadata M = Metadata()
-    .title("Mark H's Siftrinth")
+    .title("Siftrinth")
     .package("com.markh.siftrinth", "1.0")
     .icon(Icon)
     .cubeRange(NUM_CUBES);
 
 static CubeBoard boards[NUM_CUBES];
-static int g_iCurColor;
+static short g_starsCollected[NUM_CUBES];
+static bool g_bColorsUsed[NUM_COLORS];
+//static int g_iCurColor;
 static int g_iCurMode;
 static int g_iScore;
+static int g_iBoardReset;	//What board to reset if it's empty
+
+int findNextColor()
+{
+	for(int i = 0; i < NUM_COLORS; i++)
+	{
+		if(!g_bColorsUsed[i])
+			return i;
+	}
+	return 0;	//Error
+}
 
 static void onNeighborAdd(void* ctxt, unsigned cube0, unsigned side0, unsigned cube1, unsigned side1) 
 {
-	if(g_iCurMode == BOARD_WAITPORTAL && boards[cube0].touched(side0, &boards[cube1], side1, g_iCurColor + 1))
+	int iNextColor = findNextColor();
+	if(g_iCurMode == BOARD_WAITPORTAL && boards[cube0].touched(side0, &boards[cube1], side1, iNextColor))
 	{
-		g_iCurColor++;
+		//g_iCurColor++;
+		g_bColorsUsed[iNextColor] = true;
 		g_iCurMode &= ~BOARD_WAITPORTAL;
 		for(int iCube = 0; iCube < NUM_CUBES; iCube++)
 		{
@@ -54,9 +71,14 @@ static void onTouch(void* ctxt, unsigned cube)
 		boards[0].addMarble(fPos, fVel);
 		
 		//Other starting tasks
-		g_iCurColor = -1;
+		//g_iCurColor = -1;
+		for(int i = 0; i < NUM_COLORS; i++)
+			g_bColorsUsed[i] = false;
 		g_iScore = -1;
 		g_iCurMode = BOARD_NOTHING;
+		for(int i = 0; i < NUM_CUBES; i++)
+			g_starsCollected[i] = 0;
+		g_iBoardReset = -1;
 	}
 	if(g_iCurMode & BOARD_WAITPORTAL && boards[cube].hasMarble())	//Tap on the flashy arrow cube to ignore portal
 	{
@@ -73,7 +95,12 @@ static void onTouch(void* ctxt, unsigned cube)
 	
 void main()
 {
-	g_iCurColor = -1;
+	//g_iCurColor = -1;
+	for(int i = 0; i < NUM_CUBES; i++)
+		g_starsCollected[i] = 0;
+	for(int i = 0; i < NUM_COLORS; i++)
+		g_bColorsUsed[i] = false;
+	g_iBoardReset = -1;
 	g_iScore = -1;
     TimeStep ts;
 	float fTapPromptDelay = 0.0;
@@ -110,11 +137,13 @@ void main()
 					{
 						iMode ^= BOARD_GOTPOINT;
 						g_iScore++;
+						if(++g_starsCollected[i] == NUM_STARS_CUBE)
+							g_iBoardReset = i;
 						//TODO sound
 					}
 					if(iMode & BOARD_DIED)
 					{
-						//TODO game over screen
+						//Show game over screen
 						iMode ^= BOARD_DIED;
 						iMode |= MODE_GAMEOVER;
 						td.draw(boards[i].getVid(), "Game over", 6);
@@ -123,6 +152,18 @@ void main()
 						td.draw(boards[i].getVid(), s.c_str(), 8);
 						fTapPromptDelay = 0.0;
 						iBoardDied = i;
+					}
+					if(iMode & BOARD_LEFT)
+					{
+						iMode ^= BOARD_LEFT;
+						if(g_iBoardReset == i)
+						{
+							boards[i].reset(g_bColorsUsed);
+							g_starsCollected[i] = 0;
+							g_iBoardReset = -1;
+							g_iScore += 3;	//Three points for clearing board
+							//TODO: Some kind of sound or effect for clearing board
+						}
 					}
 					g_iCurMode = iMode;
 					break;

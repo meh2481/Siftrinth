@@ -1,7 +1,5 @@
-Better portal artwork
 Sounds/music
 Finish maps
-Reset cube on cube clear and leave (and tap?)
 
 stretch goals:
 High score system

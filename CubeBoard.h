@@ -14,6 +14,7 @@ using namespace Sifteo;
 #define BOARD_DIED			2
 #define BOARD_GOTPOINT		4
 #define MODE_GAMEOVER		8
+#define BOARD_LEFT			16
 
 #define MARBLE_RADIUS	3
 
@@ -36,6 +37,7 @@ class Portal
 public:
 	CubeBoard *other;
 	int thisSide, otherSide;
+	int color;
 };
 
 class CubeBoard 
@@ -46,7 +48,7 @@ protected:
 	Circle m_marble;			//Current marble position (If the marble's in this cube)
 	Float2 m_marbleVelocity;	//Current marble speed (If the marble's in this cube)
 	Portal m_pPortals[4];		//Portals to other cubes - one for each side
-	short m_iPortalColors[4];	//The color each portal on each side is
+	//short m_iPortalColors[4];	//The color each portal on each side is
 	short m_iTilemap;			//What tilemap we're using
 	bool m_bVWallSegments[TILEMAP_HEIGHT][TILEMAP_WIDTH-1];	//Line segments for horizontal walls
 	bool m_bHWallSegments[TILEMAP_HEIGHT-1][TILEMAP_WIDTH];	//And vertical walls
@@ -84,6 +86,7 @@ public:
 	void showArrows();							//Show flashing arrows for portals
 	void hideArrows();							//Hide flashing arrows for portals
 	void spitBack();							//Spit marble back out of portal
+	void reset(bool* bColorList);				//Restart this cube and close all open portals to/from it (updating the pointed-to list)
 };
 
 

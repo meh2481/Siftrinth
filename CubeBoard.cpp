@@ -1,6 +1,7 @@
 #include "CubeBoard.h"
 
 static Random r;			//For generating random numbers
+static TextDraw td;			//For drawing text
 
 CubeBoard::CubeBoard()
 {
@@ -51,7 +52,7 @@ bool CubeBoard::isHole()
 {
 	//Enable cheating by turning upside-down, just like real life
 	float accel = m_vid.physicalAccel().z;
-	if(accel < 0)//< 0)	//TODO
+	if(accel > 0)//< 0)	//TODO
 		return false;
 		
 	Int2 gridPos;
@@ -254,6 +255,7 @@ int CubeBoard::update(float fTimestep)
 						}
 						m_pPortals[LEFT].other->addMarble(newPos, newVel);
 						m_bHasMarble = false;
+						iReturn |= BOARD_LEFT;
 					}
 				}
 			}
@@ -303,6 +305,7 @@ int CubeBoard::update(float fTimestep)
 						}
 						m_pPortals[RIGHT].other->addMarble(newPos, newVel);
 						m_bHasMarble = false;
+						iReturn |= BOARD_LEFT;
 					}
 				}
 			}
@@ -353,6 +356,7 @@ int CubeBoard::update(float fTimestep)
 						}
 						m_pPortals[TOP].other->addMarble(newPos, newVel);
 						m_bHasMarble = false;
+						iReturn |= BOARD_LEFT;
 					}
 				}
 			}
@@ -402,6 +406,7 @@ int CubeBoard::update(float fTimestep)
 						}
 						m_pPortals[BOTTOM].other->addMarble(newPos, newVel);
 						m_bHasMarble = false;
+						iReturn |= BOARD_LEFT;
 					}
 				}
 			}
@@ -511,6 +516,12 @@ void CubeBoard::initTilemap()
 			}
 		}
 	}
+	
+	//Now draw white (blank) portals
+	for(int i = 0; i < 4; i++)
+	{
+		makePortalColor(i, -1);
+	}
 }
 
 //Add a marble to this board
@@ -560,35 +571,36 @@ bool CubeBoard::touched(unsigned mySide, CubeBoard* other, unsigned otherSide, i
 void CubeBoard::makePortalColor(int side, int color)
 {
 	Int2 pos;
+	m_pPortals[side].color = color;	//Save this color
 	switch(side)
 	{
 		case LEFT:
 			pos.x = 0;
 			pos.y = 7;
-			m_vid.bg0.image(pos, Portals, color);
-			pos.y = 8;
-			m_vid.bg0.image(pos, Portals, color);
+			m_vid.bg0.image(pos, PortalsL, color+1);
+			//pos.y = 8;
+			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case TOP:
 			pos.x = 7;
 			pos.y = 0;
-			m_vid.bg0.image(pos, Portals, color);
-			pos.x = 8;
-			m_vid.bg0.image(pos, Portals, color);
+			m_vid.bg0.image(pos, PortalsT, color+1);
+			//pos.x = 8;
+			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case RIGHT:
 			pos.x = 15;
 			pos.y = 7;
-			m_vid.bg0.image(pos, Portals, color);
-			pos.y = 8;
-			m_vid.bg0.image(pos, Portals, color);
+			m_vid.bg0.image(pos, PortalsR, color+1);
+			//pos.y = 8;
+			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case BOTTOM:
 			pos.y = 15;
 			pos.x = 7;
-			m_vid.bg0.image(pos, Portals, color);
-			pos.x = 8;
-			m_vid.bg0.image(pos, Portals, color);
+			m_vid.bg0.image(pos, PortalsB, color+1);
+			//pos.x = 8;
+			//m_vid.bg0.image(pos, Portals, color);
 			break;
 	}
 }
@@ -649,8 +661,12 @@ void CubeBoard::showArrows()
 			m_vid.bg1.setMask(mask);
 			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);
 		}
-		TextDraw td;
 		td.draw(&m_vid, "Tap to ignore", 10);
+		if(m_iSideOut == BOTTOM)	//HACK: Why this no work otherwise?
+		{
+			UInt2 pos = getPos(m_iSideOut);
+			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);
+		}
 	}
 	else
 	{
@@ -709,7 +725,24 @@ void CubeBoard::spitBack()
 	}
 }
 
-
+void CubeBoard::reset(bool* bColorList)
+{
+	for(int i = 0; i < 4; i++)
+	{
+		if(m_pPortals[i].other != NULL)
+		{
+			bColorList[m_pPortals[i].color] = false;
+			m_pPortals[i].other->m_pPortals[m_pPortals[i].otherSide].other = NULL;
+			//Reset portal color on other cube
+			m_pPortals[i].other->makePortalColor(m_pPortals[i].otherSide, -1);
+			m_pPortals[i].other = NULL;
+		}
+	}
+	initTilemap();
+	//Draw portals on this board white
+	for(int i = 0; i < 4; i++)
+		makePortalColor(i, -1);
+}
 
 
 
