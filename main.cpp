@@ -33,6 +33,31 @@ static void onNeighborAdd(void* ctxt, unsigned cube0, unsigned side0, unsigned c
 		}
 	}
 }
+
+static void onTouch(void* ctxt, unsigned cube)
+{
+	if(g_iCurMode & MODE_GAMEOVER && boards[cube].hasMarble())
+	{
+		for(int i = 0; i < NUM_CUBES; i++)
+		{
+			boards[i].getVid()->bg1.eraseMask();	//Wipe "game over" screen
+			boards[i].initTilemap();	//Load a new tilemap into each
+			boards[i].takeMarble();
+		}
+		//Add marble to first cube
+		Float2 fVel;
+		fVel.set(0,0);
+		Float2 fPos = LCD_center;
+		fPos.x += TILE_WIDTH/2.0;
+		fPos.y += TILE_HEIGHT/2.0;
+		boards[0].addMarble(fPos, fVel);
+		
+		//Other starting tasks
+		g_iCurColor = -1;
+		g_iScore = -1;
+		g_iCurMode = BOARD_NOTHING;
+	}
+}
 	
 void main()
 {
@@ -44,6 +69,7 @@ void main()
 	for(int i = 0; i < NUM_CUBES; i++)
 		boards[i].init(i);
 	Events::neighborAdd.set(onNeighborAdd);	//Function for when two cubes touch each other
+	Events::cubeTouch.set(onTouch);			//Function for when a cube is tapped
 	
 	//Add marble to one
 	Float2 fVel;
@@ -52,6 +78,9 @@ void main()
 	fPos.x += TILE_WIDTH/2.0;
 	fPos.y += TILE_HEIGHT/2.0;
 	boards[0].addMarble(fPos, fVel);
+	
+	TextDraw td;
+	//td.draw(boards[1].getVid(), "Hai thar");
 	
 	//Main loop
     while (1) 
@@ -74,6 +103,11 @@ void main()
 					{
 						//TODO game over screen
 						iMode ^= BOARD_DIED;
+						iMode |= MODE_GAMEOVER;
+						td.draw(boards[i].getVid(), "Game over", 6);
+						String<64> s;
+						s << "Score: " << g_iScore;
+						td.draw(boards[i].getVid(), s.c_str(), 8);
 					}
 					g_iCurMode = iMode;
 					break;

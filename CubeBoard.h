@@ -5,6 +5,7 @@
 #include "assets.gen.h"
 #include "levels.h"
 #include "Circle.h"
+#include "TextDraw.h"
 using namespace Sifteo;
 
 //Return codes for CubeBoard::update()
@@ -12,6 +13,7 @@ using namespace Sifteo;
 #define BOARD_WAITPORTAL	1
 #define BOARD_DIED			2
 #define BOARD_GOTPOINT		4
+#define MODE_GAMEOVER		8
 
 #define MARBLE_RADIUS	3
 
@@ -69,6 +71,8 @@ public:
 	//Accessor methods
 	bool hasMarble()		{return m_bHasMarble;};		//If this cube board has the marble in it
 	void addMarble(Float2 pos, Float2 vel);				//Put the marble in this cube board
+	void takeMarble()		{m_bHasMarble = false;};	//So we don't end up with broken arrows and such on reset
+	VideoBuffer* getVid()	{return &m_vid;};
 	
 	//General methods
 	int update(float fTimestep);	//Update the board and marble and such 

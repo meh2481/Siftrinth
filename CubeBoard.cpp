@@ -51,7 +51,7 @@ bool CubeBoard::isHole()
 {
 	//Enable cheating by turning upside-down, just like real life
 	float accel = m_vid.physicalAccel().z;
-	if(accel > 0)//< 0)	TODO
+	if(accel > 0)//< 0)	//TODO
 		return false;
 		
 	Int2 gridPos;
@@ -163,7 +163,7 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 }
 
 int CubeBoard::update(float fTimestep)
-{	
+{
 	int iReturn = BOARD_NOTHING;
 	if(m_bFirstCycle)	//HACK because of strange first-frame draw issues
 	{
@@ -414,7 +414,10 @@ int CubeBoard::update(float fTimestep)
 		Float2 drawPos = m_marble.pos;
 		m_vid.sprites[0].move(m_marble.pos.x - TILE_WIDTH/2.0, m_marble.pos.y - TILE_HEIGHT/2.0);
 		if(isHole())
-			iReturn |= BOARD_DIED;//m_vid.sprites[0].hide();	//TODO: Game over dialog and such
+		{
+			iReturn |= BOARD_DIED;
+			m_vid.sprites[0].hide();
+		}
 		if(isStar())
 			iReturn |= BOARD_GOTPOINT;
 	}
@@ -434,7 +437,6 @@ int CubeBoard::update(float fTimestep)
 			m_vid.sprites[i].setImage(Star, m_iCurStarFrames[i-1]);
 		}
 	}
-	
 	return iReturn;
 }
 
@@ -448,6 +450,22 @@ void CubeBoard::init(CubeID cube)
 //Read in a random maze
 void CubeBoard::initTilemap()
 {
+	//If there are any portals, destroy them
+	for(int i = 0; i < 4; i++)
+	{
+		if(m_pPortals[i].other != NULL)
+		{
+			for(int j = 0; j < 4; j++)
+			{
+				if(m_pPortals[i].other->m_pPortals[j].other == this &&
+				   m_pPortals[i].other->m_pPortals[j].thisSide == m_pPortals[i].otherSide &&
+				   m_pPortals[i].other->m_pPortals[j].otherSide == m_pPortals[i].thisSide)
+					m_pPortals[i].other->m_pPortals[j].other = NULL;	//Destroy other link
+			}
+			m_pPortals[i].other = NULL;	//And this link
+			//TODO Clear color in other board
+		}
+	}
 	m_iNumStars = 0;
 	m_iTilemap = r.randint(0,NUM_MAPS-1);	//Hang onto this for collision testing later
 	for(int y = 0; y < TILEMAP_HEIGHT; y++)

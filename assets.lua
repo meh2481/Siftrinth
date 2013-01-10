@@ -10,3 +10,4 @@ Ball = image{"ball.png", pinned=true, quality=10}
 Star = image{"star.png", pinned=true, width=8, height=8}
 Arrows = image{"arrow.png", width=16, height=16}
 ArrowsRed = image{"arrowred.png", width=16, height=16}
+Font = image{"font.png", width=8, height=8}
