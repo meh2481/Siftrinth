@@ -14,3 +14,8 @@ Star = image{"star.png", pinned=true, width=8, height=8}
 Arrows = image{"arrow.png", width=16, height=16}
 ArrowsRed = image{"arrowred.png", width=16, height=16}
 Font = image{"font.png", width=8, height=8}
+sPortalEnter = sound{"portal_in.wav"}
+sPortalExit = sound{"portal_out.wav"}
+sThroughPortal = sound{"portal.wav"}
+sGetStar = sound{"getstar.wav"}
+--sMusic = sound{"music.wav", loop=true}

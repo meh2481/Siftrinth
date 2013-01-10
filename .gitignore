@@ -16,9 +16,12 @@
 # Compiled executables
 *.elf
 
-# Art assets
+# Art/sound assets
 *.png
 *.svg
+*.aup
+*.wav
+musicsetup_data/*
 
 # Generated C++ files
 *.gen.cpp

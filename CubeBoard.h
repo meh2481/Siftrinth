@@ -26,8 +26,8 @@ using namespace Sifteo;
 
 #define NUM_PHYSICS_STEPS 3	//In case of lag or a large accelerometer reading, to prevent tunnelling
 
-#define NUM_STARS	7	//How many stars per map
-#define STAR_UPDATE_TIME	0.05
+#define NUM_STARS	7				//How many stars per map
+#define STAR_UPDATE_TIME	0.05	//How many seconds between each star animation frame
 
 class Portal;
 class CubeBoard;
@@ -48,7 +48,6 @@ protected:
 	Circle m_marble;			//Current marble position (If the marble's in this cube)
 	Float2 m_marbleVelocity;	//Current marble speed (If the marble's in this cube)
 	Portal m_pPortals[4];		//Portals to other cubes - one for each side
-	//short m_iPortalColors[4];	//The color each portal on each side is
 	short m_iTilemap;			//What tilemap we're using
 	bool m_bVWallSegments[TILEMAP_HEIGHT][TILEMAP_WIDTH-1];	//Line segments for horizontal walls
 	bool m_bHWallSegments[TILEMAP_HEIGHT-1][TILEMAP_WIDTH];	//And vertical walls

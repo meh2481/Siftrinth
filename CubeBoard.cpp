@@ -471,7 +471,6 @@ void CubeBoard::initTilemap()
 					m_pPortals[i].other->m_pPortals[j].other = NULL;	//Destroy other link
 			}
 			m_pPortals[i].other = NULL;	//And this link
-			//TODO Clear color in other board
 		}
 	}
 	m_iNumStars = 0;
@@ -519,9 +518,7 @@ void CubeBoard::initTilemap()
 	
 	//Now draw white (blank) portals
 	for(int i = 0; i < 4; i++)
-	{
 		makePortalColor(i, -1);
-	}
 }
 
 //Add a marble to this board
@@ -578,29 +575,21 @@ void CubeBoard::makePortalColor(int side, int color)
 			pos.x = 0;
 			pos.y = 7;
 			m_vid.bg0.image(pos, PortalsL, color+1);
-			//pos.y = 8;
-			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case TOP:
 			pos.x = 7;
 			pos.y = 0;
 			m_vid.bg0.image(pos, PortalsT, color+1);
-			//pos.x = 8;
-			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case RIGHT:
 			pos.x = 15;
 			pos.y = 7;
 			m_vid.bg0.image(pos, PortalsR, color+1);
-			//pos.y = 8;
-			//m_vid.bg0.image(pos, Portals, color);
 			break;
 		case BOTTOM:
 			pos.y = 15;
 			pos.x = 7;
 			m_vid.bg0.image(pos, PortalsB, color+1);
-			//pos.x = 8;
-			//m_vid.bg0.image(pos, Portals, color);
 			break;
 	}
 }
@@ -665,7 +654,7 @@ void CubeBoard::showArrows()
 		if(m_iSideOut == BOTTOM)	//HACK: Why this no work otherwise?
 		{
 			UInt2 pos = getPos(m_iSideOut);
-			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);
+			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);	//Why do we have to draw this again?
 		}
 	}
 	else
