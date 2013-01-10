@@ -83,6 +83,7 @@ public:
 	void resetFlashTimer()			{m_fAccumulatedArrowTime = 1.0f;};	//Reset the timer for flashing arrows
 	void showArrows();							//Show flashing arrows for portals
 	void hideArrows();							//Hide flashing arrows for portals
+	void spitBack();							//Spit marble back out of portal
 };
 
 

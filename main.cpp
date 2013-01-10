@@ -4,6 +4,7 @@
 
 #include "CubeBoard.h"
 #define NUM_CUBES	3
+#define TAP_PROMPT_DELAY	3.0
 
 static AssetSlot MainSlot = AssetSlot::allocate()
     .bootstrap(GameAssets);
@@ -36,7 +37,7 @@ static void onNeighborAdd(void* ctxt, unsigned cube0, unsigned side0, unsigned c
 
 static void onTouch(void* ctxt, unsigned cube)
 {
-	if(g_iCurMode & MODE_GAMEOVER && boards[cube].hasMarble())
+	if(g_iCurMode & MODE_GAMEOVER && boards[cube].hasMarble())	//Tap on the "game over" cube to restart
 	{
 		for(int i = 0; i < NUM_CUBES; i++)
 		{
@@ -57,6 +58,17 @@ static void onTouch(void* ctxt, unsigned cube)
 		g_iScore = -1;
 		g_iCurMode = BOARD_NOTHING;
 	}
+	if(g_iCurMode & BOARD_WAITPORTAL && boards[cube].hasMarble())	//Tap on the flashy arrow cube to ignore portal
+	{
+		boards[cube].spitBack();	//Spit marble back out
+		g_iCurMode = BOARD_NOTHING;
+		for(int iCube = 0; iCube < NUM_CUBES; iCube++)
+		{
+			//Hide any flashy arrows
+			boards[iCube].hideArrows();
+			boards[iCube].resetFlashTimer();
+		}
+	}
 }
 	
 void main()
@@ -64,6 +76,8 @@ void main()
 	g_iCurColor = -1;
 	g_iScore = -1;
     TimeStep ts;
+	float fTapPromptDelay = 0.0;
+	int iBoardDied;
 
 	//Initialize our boards
 	for(int i = 0; i < NUM_CUBES; i++)
@@ -80,7 +94,6 @@ void main()
 	boards[0].addMarble(fPos, fVel);
 	
 	TextDraw td;
-	//td.draw(boards[1].getVid(), "Hai thar");
 	
 	//Main loop
     while (1) 
@@ -108,12 +121,21 @@ void main()
 						String<64> s;
 						s << "Score: " << g_iScore;
 						td.draw(boards[i].getVid(), s.c_str(), 8);
+						fTapPromptDelay = 0.0;
+						iBoardDied = i;
 					}
 					g_iCurMode = iMode;
 					break;
 				case BOARD_WAITPORTAL:
 					boards[i].waitPortal(float(ts.delta()));
 					break;
+				case MODE_GAMEOVER:
+					fTapPromptDelay += float(ts.delta()) / 3.0;
+					if(fTapPromptDelay >= TAP_PROMPT_DELAY && fTapPromptDelay < 100.0)
+					{
+						fTapPromptDelay = 100;
+						td.draw(boards[iBoardDied].getVid(), "Tap to restart", 14);
+					}
 			}
 		}
 		

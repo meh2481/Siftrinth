@@ -51,11 +51,14 @@ bool CubeBoard::isHole()
 {
 	//Enable cheating by turning upside-down, just like real life
 	float accel = m_vid.physicalAccel().z;
-	if(accel > 0)//< 0)	//TODO
+	if(accel < 0)//< 0)	//TODO
 		return false;
 		
 	Int2 gridPos;
 	gridPos.set(m_marble.pos.x / TILE_WIDTH, m_marble.pos.y / TILE_HEIGHT);
+	if(gridPos.x < 0 || gridPos.x >= TILEMAP_WIDTH ||
+	   gridPos.y < 0 || gridPos.y >= TILEMAP_HEIGHT)
+		return false;	//Off the edge of screen; don't test for hole
 	char cGridSquare = tilemap[m_iTilemap][gridPos.y][gridPos.x];
 	if(cGridSquare == 4 ||
 	   cGridSquare == 5 ||
@@ -65,7 +68,7 @@ bool CubeBoard::isHole()
 		//We're in a grid pos with a hole in it
 		Circle c;
 		c.pos.set(gridPos.x * TILE_WIDTH + TILE_WIDTH/2.0, gridPos.y * TILE_WIDTH + TILE_WIDTH/2.0);
-		c.radius = TILE_WIDTH/2.0 - 2.5;
+		c.radius = TILE_WIDTH/2.0 - 1.5;
 		if(c.touching(&m_marble.pos))
 			return true;
 	}
@@ -218,7 +221,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn |= BOARD_WAITPORTAL;
+						iReturn = BOARD_WAITPORTAL;
 						m_iSideOut = LEFT;
 					}
 					else
@@ -267,7 +270,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn |= BOARD_WAITPORTAL;
+						iReturn = BOARD_WAITPORTAL;
 						m_iSideOut = RIGHT;
 					}
 					else
@@ -317,7 +320,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn |= BOARD_WAITPORTAL;
+						iReturn = BOARD_WAITPORTAL;
 						m_iSideOut = TOP;
 					}
 					else
@@ -366,7 +369,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn |= BOARD_WAITPORTAL;
+						iReturn = BOARD_WAITPORTAL;
 						m_iSideOut = BOTTOM;
 					}
 					else
@@ -415,11 +418,11 @@ int CubeBoard::update(float fTimestep)
 		m_vid.sprites[0].move(m_marble.pos.x - TILE_WIDTH/2.0, m_marble.pos.y - TILE_HEIGHT/2.0);
 		if(isHole())
 		{
-			iReturn |= BOARD_DIED;
+			iReturn = BOARD_DIED;
 			m_vid.sprites[0].hide();
 		}
 		if(isStar())
-			iReturn |= BOARD_GOTPOINT;
+			iReturn = BOARD_GOTPOINT;
 	}
 	
 	//Update star animation
@@ -536,6 +539,9 @@ bool CubeBoard::touched(unsigned mySide, CubeBoard* other, unsigned otherSide, i
 	if(m_pPortals[mySide].other != NULL || other->m_pPortals[otherSide].other != NULL)
 		return false;
 	
+	if(m_iSideOut != mySide)	//Only create portal on side the ball went through
+		return false;
+	
 	//Make connection
 	m_pPortals[mySide].other = other;
 	m_pPortals[mySide].otherSide = otherSide;
@@ -643,6 +649,8 @@ void CubeBoard::showArrows()
 			m_vid.bg1.setMask(mask);
 			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);
 		}
+		TextDraw td;
+		td.draw(&m_vid, "Tap to ignore", 10);
 	}
 	else
 	{
@@ -681,7 +689,25 @@ void CubeBoard::hideArrows()
 	m_bShowingArrows = false;
 }
 
-
+void CubeBoard::spitBack()
+{
+	m_marbleVelocity *= -1;
+	switch(m_iSideOut)
+	{
+		case LEFT:
+			m_marble.pos.x += m_marble.radius;
+			break;
+		case TOP:
+			m_marble.pos.y += m_marble.radius;
+			break;
+		case RIGHT:
+			m_marble.pos.x -= m_marble.radius;
+			break;
+		case BOTTOM:
+			m_marble.pos.y -= m_marble.radius;
+			break;
+	}
+}
 
 
 
