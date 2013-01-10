@@ -221,7 +221,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn = BOARD_WAITPORTAL;
+						iReturn |= BOARD_WAITPORTAL;
 						m_iSideOut = LEFT;
 					}
 					else
@@ -270,7 +270,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn = BOARD_WAITPORTAL;
+						iReturn |= BOARD_WAITPORTAL;
 						m_iSideOut = RIGHT;
 					}
 					else
@@ -320,7 +320,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn = BOARD_WAITPORTAL;
+						iReturn |= BOARD_WAITPORTAL;
 						m_iSideOut = TOP;
 					}
 					else
@@ -369,7 +369,7 @@ int CubeBoard::update(float fTimestep)
 					if(other == NULL)
 					{
 						//Wait for another cube to attach
-						iReturn = BOARD_WAITPORTAL;
+						iReturn |= BOARD_WAITPORTAL;
 						m_iSideOut = BOTTOM;
 					}
 					else
@@ -418,11 +418,11 @@ int CubeBoard::update(float fTimestep)
 		m_vid.sprites[0].move(m_marble.pos.x - TILE_WIDTH/2.0, m_marble.pos.y - TILE_HEIGHT/2.0);
 		if(isHole())
 		{
-			iReturn = BOARD_DIED;
+			iReturn |= BOARD_DIED;
 			m_vid.sprites[0].hide();
 		}
 		if(isStar())
-			iReturn = BOARD_GOTPOINT;
+			iReturn |= BOARD_GOTPOINT;
 	}
 	
 	//Update star animation
