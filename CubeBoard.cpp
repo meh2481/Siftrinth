@@ -11,7 +11,10 @@ CubeBoard::CubeBoard()
 	m_bHasMarble = false;
 	m_marbleVelocity.x = m_marbleVelocity.y = 0;
 	for(int i = 0; i < 4; i++)
+	{
 		m_pPortals[i].other = NULL;
+		m_pPortals[i].bActivatable = true;
+	}
 	for(int i = 0; i < TILEMAP_HEIGHT; i++)
 	{
 		for(int j = 0; j < TILEMAP_HEIGHT-1; j++)
@@ -235,7 +238,7 @@ int CubeBoard::update(float fTimestep)
 			//Check for collision with the edges of the screen (Except for portals)
 			if (candidate.x < minPosition.x)	//Left side
 			{
-				if((candidate.y < portal_dist || candidate.y > portal2_dist))
+				if((candidate.y < portal_dist || candidate.y > portal2_dist) || !m_pPortals[LEFT].bActivatable)
 				{
 					if(m_marbleVelocity.x < 0) 
 					{
@@ -288,7 +291,7 @@ int CubeBoard::update(float fTimestep)
 			}
 			else if (candidate.x > maxPosition.x)	//Right side
 			{
-				if((candidate.y < portal_dist || candidate.y > portal2_dist))
+				if((candidate.y < portal_dist || candidate.y > portal2_dist) || !m_pPortals[RIGHT].bActivatable)
 				{
 					if(m_marbleVelocity.x > 0) 
 					{
@@ -342,7 +345,7 @@ int CubeBoard::update(float fTimestep)
 
 			else if (candidate.y < minPosition.y)	//Top side
 			{
-				if((candidate.x < portal_dist || candidate.x > portal2_dist))
+				if((candidate.x < portal_dist || candidate.x > portal2_dist) || !m_pPortals[TOP].bActivatable)
 				{
 					if(m_marbleVelocity.y < 0)
 					{
@@ -395,7 +398,7 @@ int CubeBoard::update(float fTimestep)
 			}
 			else if (candidate.y > maxPosition.y)	//Bottom side
 			{
-				if((candidate.x < portal_dist || candidate.x > portal2_dist))
+				if((candidate.x < portal_dist || candidate.x > portal2_dist) || !m_pPortals[BOTTOM].bActivatable)
 				{
 					if(m_marbleVelocity.y > 0) 
 					{
@@ -497,6 +500,8 @@ void CubeBoard::initTilemap()
 	//If there are any portals, destroy them
 	for(int i = 0; i < 4; i++)
 	{
+		//Reset all portals to be activateable
+		m_pPortals[i].bActivatable = true;
 		if(m_pPortals[i].other != NULL)
 		{
 			for(int j = 0; j < 4; j++)
@@ -552,9 +557,39 @@ void CubeBoard::initTilemap()
 		}
 	}
 	
+	//Determine sides that the portals can form on
+	//Left side
+	char iVal = tilemap[m_iTilemap][7][0];
+	if(iVal >= 20)
+		iVal -= 20;
+	if(!(iVal == 1 || iVal == 5))	//Not the correct wall here; no portal
+		m_pPortals[LEFT].bActivatable = false;
+	//Right side
+	iVal = tilemap[m_iTilemap][7][15];
+	if(iVal >= 20)
+		iVal -= 20;
+	if(!(iVal == 1 || iVal == 5 || iVal == 3 || iVal == 7))	//Not the correct wall here; no portal
+		m_pPortals[RIGHT].bActivatable = false;
+	//Top side
+	iVal = tilemap[m_iTilemap][0][7];
+	if(iVal >= 20)
+		iVal -= 20;
+	if(!(iVal == 2 || iVal == 6))	//Not the correct wall here; no portal
+		m_pPortals[TOP].bActivatable = false;
+	//Bottom side
+	iVal = tilemap[m_iTilemap][15][7];
+	if(iVal >= 20)
+		iVal -= 20;
+	if(!(iVal == 2 || iVal == 6 || iVal == 3 || iVal == 7))	//Not the correct wall here; no portal
+		m_pPortals[BOTTOM].bActivatable = false;
+	
+	
 	//Now draw white (blank) portals
 	for(int i = 0; i < 4; i++)
-		makePortalColor(i, -1);
+	{
+		if(m_pPortals[i].bActivatable)
+			makePortalColor(i, -1);
+	}
 }
 
 //Add a marble to this board
@@ -581,6 +616,10 @@ bool CubeBoard::touched(unsigned mySide, CubeBoard* other, unsigned otherSide, i
 	}
 	//If either portal is claimed already, return
 	if(m_pPortals[mySide].other != NULL || other->m_pPortals[otherSide].other != NULL)
+		return false;
+	
+	//If either side cannot make a portal there, return
+	if(!m_pPortals[mySide].bActivatable || !other->m_pPortals[otherSide].bActivatable)
 		return false;
 	
 	if(m_iSideOut != mySide)	//Only create portal on side the ball went through
@@ -686,7 +725,7 @@ void CubeBoard::showArrows()
 			m_vid.bg1.setMask(mask);
 			m_vid.bg1.image(pos, ArrowsRed, m_iSideOut);
 		}
-		td.draw(&m_vid, "Tap to ignore", 10);
+		td.draw(&m_vid, "Tap to cancel", 10);
 		if(m_iSideOut == BOTTOM)	//HACK: Why this no work otherwise?
 		{
 			UInt2 pos = getPos(m_iSideOut);
@@ -697,7 +736,7 @@ void CubeBoard::showArrows()
 	{
 		for(int iSide = 0; iSide < 4; iSide++)
 		{
-			if(m_pPortals[iSide].other != NULL)
+			if(m_pPortals[iSide].other != NULL || !m_pPortals[iSide].bActivatable)
 				continue;
 			
 			UInt2 pos = getPos(iSide);
@@ -707,7 +746,7 @@ void CubeBoard::showArrows()
 		m_vid.bg1.setMask(mask);
 		for(int iSide = 0; iSide < 4; iSide++)
 		{
-			if(m_pPortals[iSide].other != NULL)
+			if(m_pPortals[iSide].other != NULL || !m_pPortals[iSide].bActivatable)
 				continue;
 			
 			UInt2 pos = getPos(iSide);
@@ -752,6 +791,7 @@ void CubeBoard::spitBack()
 
 void CubeBoard::reset(bool* bColorList)
 {
+	//We have to do this here outside of initTilemap() as well in order to make sure the colors of portals come out right 
 	for(int i = 0; i < 4; i++)
 	{
 		if(m_pPortals[i].other != NULL)
@@ -761,12 +801,16 @@ void CubeBoard::reset(bool* bColorList)
 			//Reset portal color on other cube
 			m_pPortals[i].other->makePortalColor(m_pPortals[i].otherSide, -1);
 			m_pPortals[i].other = NULL;
+			m_pPortals[i].bActivatable = true;
 		}
 	}
 	initTilemap();
 	//Draw portals on this board white
-	for(int i = 0; i < 4; i++)
-		makePortalColor(i, -1);
+	/*for(int i = 0; i < 4; i++)
+	{
+		if(m_pPortals[i].bActivatable)
+			makePortalColor(i, -1);
+	}*/
 }
 
 

@@ -68,6 +68,8 @@ static void onTouch(void* ctxt, unsigned cube)
 {
 	if(g_iCurMode & MODE_GAMEOVER && boards[cube].hasMarble())	//Tap on the "game over" cube to restart
 	{
+		//Play sound effect for clearing board (also board reset-- why not?)
+		channels[BOARD_SFX_CHANNEL]->play(sBoardClear);
 		for(int i = 0; i < NUM_CUBES; i++)
 		{
 			boards[i].getVid()->bg1.eraseMask();	//Wipe "game over" screen
@@ -217,7 +219,8 @@ void main()
 							g_starsCollected[i] = 0;
 							g_iBoardReset = -1;
 							g_iScore += 3;	//Three points for clearing board
-							//TODO: Some kind of sound or effect for clearing board
+							//Play sound effect for clearing board
+							channels[BOARD_SFX_CHANNEL]->play(sBoardClear);
 						}
 						//Play pass-through-portal sound
 						else if(!channels[PORTAL_CHANNEL]->isPlaying())

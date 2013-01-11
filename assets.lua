@@ -21,4 +21,5 @@ sGetStar = sound{"getstar.wav"}
 sRollLoop = sound{"rollloop.wav"}
 sHitWall = sound{"hitwall.wav"}
 sDie = sound{"die.wav"}
+sBoardClear = sound{"beatboard.wav"}
 --sMusic = sound{"music.wav", loop=true}	--I haven't found any music I liked, and I think it may be better without it

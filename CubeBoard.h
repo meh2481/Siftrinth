@@ -38,6 +38,7 @@ public:
 	CubeBoard *other;
 	int thisSide, otherSide;
 	int color;
+	bool bActivatable;	//If this wall can't have a portal, this will be true
 };
 
 class CubeBoard 
