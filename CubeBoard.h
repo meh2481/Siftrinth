@@ -59,6 +59,7 @@ protected:
 	int m_iNumStars;
 	int m_iCurStarFrames[NUM_STARS];
 	float m_fUpdateStars;
+	int m_iCurStyle;	//Style for board- space, sea, sand, or wood
 	
 	//Private methods
 	bool isHole();	//If the marble is in a hole

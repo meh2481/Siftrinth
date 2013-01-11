@@ -1,6 +1,6 @@
 #include "CubeBoard.h"
 
-static Random r;			//For generating random numbers
+Random r;			//For generating random numbers
 static TextDraw td;			//For drawing text
 
 CubeBoard::CubeBoard()
@@ -23,13 +23,13 @@ CubeBoard::CubeBoard()
 			m_bVWallSegments[j][i] = false;
 		}
 	}
-	r.seed();
 	m_bFirstCycle = true;
 	m_fAccumulatedArrowTime = 1.0f;
 	m_bShowingArrows = false;
 	m_iSideOut = -1;
 	m_iNumStars = 0;
 	m_fUpdateStars = 0.0f;
+	m_iCurStyle = 0;
 }
 
 CubeBoard::~CubeBoard()
@@ -516,6 +516,7 @@ void CubeBoard::initTilemap()
 	}
 	m_iNumStars = 0;
 	m_iTilemap = r.randint(0,NUM_MAPS-1);	//Hang onto this for collision testing later
+	m_iCurStyle = r.randint(0,3);	//Style of tilemap we're using this time around
 	for(int y = 0; y < TILEMAP_HEIGHT; y++)
 	{
 		for(int x = 0; x < TILEMAP_WIDTH; x++)
@@ -532,7 +533,21 @@ void CubeBoard::initTilemap()
 				m_vid.sprites[m_iNumStars].move(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT);
 			}
 			//Draw the proper background image for this tile
-			m_vid.bg0.image(pos, BackgroundTiles, iVal);
+			switch(m_iCurStyle)
+			{
+				case 0:
+					m_vid.bg0.image(pos, BackgroundTiles1, iVal);
+					break;
+				case 1:
+					m_vid.bg0.image(pos, BackgroundTiles2, iVal);
+					break;
+				case 2:
+					m_vid.bg0.image(pos, BackgroundTiles3, iVal);
+					break;
+				default:
+					m_vid.bg0.image(pos, BackgroundTiles4, iVal);
+					break;
+			}
 			//Add collision data for walls
 			if(x != 0)
 			{
@@ -649,22 +664,78 @@ void CubeBoard::makePortalColor(int side, int color)
 		case LEFT:
 			pos.x = 0;
 			pos.y = 7;
-			m_vid.bg0.image(pos, PortalsL, color+1);
+			switch(m_iCurStyle)
+			{
+				case 0:
+					m_vid.bg0.image(pos, PortalsL1, color+1);
+					break;
+				case 1:
+					m_vid.bg0.image(pos, PortalsL2, color+1);
+					break;
+				case 2:
+					m_vid.bg0.image(pos, PortalsL3, color+1);
+					break;
+				default:
+					m_vid.bg0.image(pos, PortalsL4, color+1);
+					break;
+			}
 			break;
 		case TOP:
 			pos.x = 7;
 			pos.y = 0;
-			m_vid.bg0.image(pos, PortalsT, color+1);
+			switch(m_iCurStyle)
+			{
+				case 0:
+					m_vid.bg0.image(pos, PortalsT1, color+1);
+					break;
+				case 1:
+					m_vid.bg0.image(pos, PortalsT2, color+1);
+					break;
+				case 2:
+					m_vid.bg0.image(pos, PortalsT3, color+1);
+					break;
+				default:
+					m_vid.bg0.image(pos, PortalsT4, color+1);
+					break;
+			}
 			break;
 		case RIGHT:
 			pos.x = 15;
 			pos.y = 7;
-			m_vid.bg0.image(pos, PortalsR, color+1);
+			switch(m_iCurStyle)
+			{
+				case 0:
+					m_vid.bg0.image(pos, PortalsR1, color+1);
+					break;
+				case 1:
+					m_vid.bg0.image(pos, PortalsR2, color+1);
+					break;
+				case 2:
+					m_vid.bg0.image(pos, PortalsR3, color+1);
+					break;
+				default:
+					m_vid.bg0.image(pos, PortalsR4, color+1);
+					break;
+			}
 			break;
 		case BOTTOM:
 			pos.y = 15;
 			pos.x = 7;
-			m_vid.bg0.image(pos, PortalsB, color+1);
+			switch(m_iCurStyle)
+			{
+				case 0:
+					m_vid.bg0.image(pos, PortalsB1, color+1);
+					break;
+				case 1:
+					m_vid.bg0.image(pos, PortalsB2, color+1);
+					break;
+				case 2:
+					m_vid.bg0.image(pos, PortalsB3, color+1);
+					break;
+				default:
+					m_vid.bg0.image(pos, PortalsB4, color+1);
+					break;
+			}
 			break;
 	}
 }

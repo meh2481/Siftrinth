@@ -118,7 +118,7 @@ void hitWallNoise(float fVelocity)
 	channels[BALL_HIT_CHANNEL]->play(sHitWall);
 	channels[BALL_HIT_CHANNEL]->setVolume(fVelocity);
 }
-	
+extern Random r;
 void main()
 {
 	//Create our audio channels
@@ -134,6 +134,7 @@ void main()
 	channels[3] = &a4;
 	channels[4] = &a5;
 	channels[5] = &a6;
+	r.seed();
 	
 	channels[BALL_ROLL_CHANNEL]->play(sRollLoop, REPEAT);	//Start playing rolling marble noise
 	channels[BALL_ROLL_CHANNEL]->setVolume(0);
