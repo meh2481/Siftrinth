@@ -13,6 +13,11 @@
 #define PORTAL_CHANNEL		1
 #define BALL_SFX_CHANNEL	2
 #define BOARD_SFX_CHANNEL	3
+#define BALL_ROLL_CHANNEL	4
+#define BALL_HIT_CHANNEL	5
+
+#define REPEAT	channels[0]->REPEAT	//Annoying enums within classes...
+#define MAX_VOLUME	channels[0]->MAX_VOLUME
 
 static AssetSlot MainSlot = AssetSlot::allocate()
     .bootstrap(GameAssets);
@@ -29,7 +34,7 @@ static bool g_bColorsUsed[NUM_COLORS];
 static int g_iCurMode;
 static int g_iScore;
 static int g_iBoardReset;	//What board to reset if it's empty
-static AudioChannel* channels[4];
+static AudioChannel* channels[6];
 
 int findNextColor()
 {
@@ -100,20 +105,36 @@ static void onTouch(void* ctxt, unsigned cube)
 		}
 	}
 }
+
+void hitWallNoise(float fVelocity)
+{
+	fVelocity *= fVelocity;
+		
+	fVelocity /= 10.0;
+	if(fVelocity > MAX_VOLUME)
+		fVelocity = MAX_VOLUME;
+	channels[BALL_HIT_CHANNEL]->play(sHitWall);
+	channels[BALL_HIT_CHANNEL]->setVolume(fVelocity);
+}
 	
 void main()
 {
 	//Create our audio channels
 	AudioChannel a1(0);
-	AudioChannel a2(2);
-	AudioChannel a3(3);
-	AudioChannel a4(4);
+	AudioChannel a2(1);
+	AudioChannel a3(2);
+	AudioChannel a4(3);
+	AudioChannel a5(4);
+	AudioChannel a6(5);
 	channels[0] = &a1;
 	channels[1] = &a2;
 	channels[2] = &a3;
 	channels[3] = &a4;
+	channels[4] = &a5;
+	channels[5] = &a6;
 	
-	//AudioChannel(0).play(sMusic, AudioChannel(0).REPEAT);	//Start playing music
+	channels[BALL_ROLL_CHANNEL]->play(sRollLoop, REPEAT);	//Start playing rolling marble noise
+	channels[BALL_ROLL_CHANNEL]->setVolume(0);
 	for(int i = 0; i < NUM_CUBES; i++)
 		g_starsCollected[i] = 0;
 	for(int i = 0; i < NUM_COLORS; i++)
@@ -152,6 +173,14 @@ void main()
 			{
 				case BOARD_NOTHING:
 					iMode = boards[i].update(float(ts.delta()));
+					//Update our rolling sound to the right volume
+					if(boards[i].hasMarble())
+					{
+						float fVol = boards[i].getMarbleVelocity() * 0.9;
+						if(fVol > MAX_VOLUME)
+							fVol = MAX_VOLUME;
+						channels[BALL_ROLL_CHANNEL]->setVolume(fVol);
+					}
 					if(iMode & BOARD_GOTPOINT)
 					{
 						iMode ^= BOARD_GOTPOINT;
@@ -176,6 +205,7 @@ void main()
 						fTapPromptDelay = 0.0;
 						iBoardDied = i;
 						bFirstSound = true;
+						channels[BALL_ROLL_CHANNEL]->setVolume(0);
 					}
 					if(iMode & BOARD_LEFT)
 					{
@@ -196,11 +226,13 @@ void main()
 					{
 						//Play sound effect for entering a portal
 						channels[PORTAL_CHANNEL]->play(sPortalEnter);
+						channels[BALL_ROLL_CHANNEL]->setVolume(0);
 					}
 					g_iCurMode = iMode;
 					break;
 				case BOARD_WAITPORTAL:
 					boards[i].waitPortal(float(ts.delta()));
+					channels[BALL_ROLL_CHANNEL]->setVolume(0);
 					break;
 				case MODE_GAMEOVER:
 					fTapPromptDelay += float(ts.delta()) / 3.0;
@@ -209,6 +241,7 @@ void main()
 						fTapPromptDelay = 100;
 						td.draw(boards[iBoardDied].getVid(), "Tap to restart", 14);
 					}
+					channels[BALL_ROLL_CHANNEL]->setVolume(0);
 			}
 		}
 		

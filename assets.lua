@@ -18,4 +18,6 @@ sPortalEnter = sound{"portal_in.wav"}
 sPortalExit = sound{"portal_out.wav"}
 sThroughPortal = sound{"portal.wav"}
 sGetStar = sound{"getstar.wav"}
+sRollLoop = sound{"rollloop.wav"}
+sHitWall = sound{"hitwall.wav"}
 --sMusic = sound{"music.wav", loop=true}

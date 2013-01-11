@@ -90,8 +90,8 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 	{
 		if(gridSquare.x > 0 && m_bVWallSegments[gridSquare.y][gridSquare.x-1])
 		{
-			m_marbleVelocity.x = -m_marbleVelocity.x;
-			m_marbleVelocity.x *= RESTITUTION;	//Bounce off
+			m_marbleVelocity.x *= -RESTITUTION;	//Bounce off
+			hitWallNoise(m_marbleVelocity.x);
 			bHit = true;
 		}
 	}
@@ -99,8 +99,8 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 	{
 		if(gridSquare.x < TILEMAP_WIDTH-1 && m_bVWallSegments[gridSquare.y][gridSquare.x])
 		{
-			m_marbleVelocity.x = -m_marbleVelocity.x;
-			m_marbleVelocity.x *= RESTITUTION;	//Bounce off
+			m_marbleVelocity.x *= -RESTITUTION;	//Bounce off
+			hitWallNoise(m_marbleVelocity.x);
 			bHit = true;
 		}
 	}
@@ -108,8 +108,8 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 	{
 		if(gridSquare.y > 0 && m_bHWallSegments[gridSquare.y-1][gridSquare.x])
 		{
-			m_marbleVelocity.y = -m_marbleVelocity.y;
-			m_marbleVelocity.y *= RESTITUTION;	//Bounce off
+			m_marbleVelocity.y *= -RESTITUTION;	//Bounce off
+			hitWallNoise(m_marbleVelocity.y);
 			bHit = true;
 		}
 	}
@@ -117,8 +117,8 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 	{
 		if(gridSquare.y < TILEMAP_HEIGHT-1 && m_bHWallSegments[gridSquare.y][gridSquare.x])
 		{
-			m_marbleVelocity.y = -m_marbleVelocity.y;
-			m_marbleVelocity.y *= RESTITUTION;	//Bounce off
+			m_marbleVelocity.y *= -RESTITUTION;	//Bounce off
+			hitWallNoise(m_marbleVelocity.y);
 			bHit = true;
 		}
 	}
@@ -134,34 +134,58 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 		fCorner.set(gridSquare.x * TILE_WIDTH, gridSquare.y * TILE_HEIGHT);
 		if(gridSquare.x > 0 && gridSquare.y > 0 && m_bHWallSegments[gridSquare.y-1][gridSquare.x-1] && 
 		   c.touching(&fCorner) && m_marbleVelocity.x < 0)
+		{
 			m_marbleVelocity.x *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.x);
+		}
 		if(gridSquare.x > 0 && gridSquare.y > 0 && m_bVWallSegments[gridSquare.y-1][gridSquare.x-1] && 
 		   c.touching(&fCorner) && m_marbleVelocity.y < 0)
+		{
 			m_marbleVelocity.y *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.y);
+		}
 		//Check lower left corner
 		fCorner.set(gridSquare.x * TILE_WIDTH, (gridSquare.y+1) * TILE_HEIGHT);
 		if(gridSquare.x > 0 && gridSquare.y < TILEMAP_HEIGHT-1 && m_bHWallSegments[gridSquare.y][gridSquare.x-1] && 
 		   c.touching(&fCorner) && m_marbleVelocity.x < 0)
+		{
 			m_marbleVelocity.x *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.x);
+		}
 		if(gridSquare.x > 0 && gridSquare.y < TILEMAP_HEIGHT-1 && m_bVWallSegments[gridSquare.y][gridSquare.x-1] && 
 		   c.touching(&fCorner) && m_marbleVelocity.y > 0)
+		{
 			m_marbleVelocity.y *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.y);
+		}
 		//Check upper right corner
 		fCorner.set((gridSquare.x+1) * TILE_WIDTH, gridSquare.y * TILE_HEIGHT);
 		if(gridSquare.x < TILEMAP_WIDTH-1 && gridSquare.y > 0 && m_bHWallSegments[gridSquare.y-1][gridSquare.x] && 
 		   c.touching(&fCorner) && m_marbleVelocity.x > 0)
+		{
 			m_marbleVelocity.x *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.x);
+		}
 		if(gridSquare.x < TILEMAP_WIDTH-1 && gridSquare.y > 0 && m_bVWallSegments[gridSquare.y-1][gridSquare.x] && 
 		   c.touching(&fCorner) && m_marbleVelocity.y < 0)
+		{	
 			m_marbleVelocity.y *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.y);
+		}
 		//Check lower right corner
 		fCorner.set((gridSquare.x+1) * TILE_WIDTH, (gridSquare.y+1) * TILE_HEIGHT);
 		if(gridSquare.x < TILEMAP_WIDTH-1 && gridSquare.y < TILEMAP_HEIGHT-1 && m_bHWallSegments[gridSquare.y][gridSquare.x] && 
 		   c.touching(&fCorner) && m_marbleVelocity.x > 0)
+		{
 			m_marbleVelocity.x *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.x);
+		}
 		if(gridSquare.x < TILEMAP_WIDTH-1 && gridSquare.y < TILEMAP_HEIGHT-1 && m_bVWallSegments[gridSquare.y][gridSquare.x] && 
 		   c.touching(&fCorner) && m_marbleVelocity.y > 0)
+		{
 			m_marbleVelocity.y *= -RESTITUTION;	//Bounce back with less velocity
+			hitWallNoise(m_marbleVelocity.y);
+		}
 	}
 	
 }
@@ -214,7 +238,10 @@ int CubeBoard::update(float fTimestep)
 				if((candidate.y < portal_dist || candidate.y > portal2_dist))
 				{
 					if(m_marbleVelocity.x < 0) 
+					{
 						m_marbleVelocity.x *= -RESTITUTION;
+						hitWallNoise(m_marbleVelocity.x);
+					}
 				}
 				else if(candidate.x < -m_marble.radius)
 				{
@@ -264,7 +291,10 @@ int CubeBoard::update(float fTimestep)
 				if((candidate.y < portal_dist || candidate.y > portal2_dist))
 				{
 					if(m_marbleVelocity.x > 0) 
+					{
 						m_marbleVelocity.x *= -RESTITUTION;
+						hitWallNoise(m_marbleVelocity.x);
+					}
 				}
 				else if(candidate.x > LCD_width + m_marble.radius)
 				{
@@ -315,7 +345,10 @@ int CubeBoard::update(float fTimestep)
 				if((candidate.x < portal_dist || candidate.x > portal2_dist))
 				{
 					if(m_marbleVelocity.y < 0)
+					{
 						m_marbleVelocity.y *= -RESTITUTION;
+						hitWallNoise(m_marbleVelocity.y);
+					}
 				}
 				else if(candidate.y < -m_marble.radius)
 				{
@@ -365,7 +398,10 @@ int CubeBoard::update(float fTimestep)
 				if((candidate.x < portal_dist || candidate.x > portal2_dist))
 				{
 					if(m_marbleVelocity.y > 0) 
+					{
 						m_marbleVelocity.y *= -RESTITUTION;
+						hitWallNoise(m_marbleVelocity.y);
+					}
 				}
 				else if(candidate.y > LCD_height + m_marble.radius)
 				{

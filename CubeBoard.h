@@ -74,6 +74,7 @@ public:
 	void addMarble(Float2 pos, Float2 vel);				//Put the marble in this cube board
 	void takeMarble()		{m_bHasMarble = false;};	//So we don't end up with broken arrows and such on reset
 	VideoBuffer* getVid()	{return &m_vid;};
+	float getMarbleVelocity() {return m_marbleVelocity.len();};
 	
 	//General methods
 	int update(float fTimestep);	//Update the board and marble and such 
@@ -88,7 +89,7 @@ public:
 	void reset(bool* bColorList);				//Restart this cube and close all open portals to/from it (updating the pointed-to list)
 };
 
-
+void hitWallNoise(float fVelocity);	//Play a bounce-off-wall sound with volume depending on velocity
 
 
 
