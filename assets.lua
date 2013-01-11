@@ -20,4 +20,5 @@ sThroughPortal = sound{"portal.wav"}
 sGetStar = sound{"getstar.wav"}
 sRollLoop = sound{"rollloop.wav"}
 sHitWall = sound{"hitwall.wav"}
---sMusic = sound{"music.wav", loop=true}
+sDie = sound{"die.wav"}
+--sMusic = sound{"music.wav", loop=true}	--I haven't found any music I liked, and I think it may be better without it

@@ -206,6 +206,7 @@ void main()
 						iBoardDied = i;
 						bFirstSound = true;
 						channels[BALL_ROLL_CHANNEL]->setVolume(0);
+						channels[BALL_SFX_CHANNEL]->play(sDie);
 					}
 					if(iMode & BOARD_LEFT)
 					{

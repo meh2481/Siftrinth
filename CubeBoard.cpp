@@ -232,7 +232,7 @@ int CubeBoard::update(float fTimestep)
 		{
 			Float2 candidate = m_marble.pos + m_marbleVelocity * fStepTimestep;	//This will be our next position if we hit nothing
 			
-			//Check for collision with the edges of the screen (TODO: Except for portals)
+			//Check for collision with the edges of the screen (Except for portals)
 			if (candidate.x < minPosition.x)	//Left side
 			{
 				if((candidate.y < portal_dist || candidate.y > portal2_dist))
