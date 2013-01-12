@@ -52,7 +52,6 @@ protected:
 	short m_iTilemap;			//What tilemap we're using
 	bool m_bVWallSegments[TILEMAP_HEIGHT][TILEMAP_WIDTH-1];	//Line segments for horizontal walls
 	bool m_bHWallSegments[TILEMAP_HEIGHT-1][TILEMAP_WIDTH];	//And vertical walls
-	bool m_bFirstCycle;	//HACK
 	bool m_bShowingArrows;	//If we're currently showing or hiding arrows
 	float m_fAccumulatedArrowTime;
 	int m_iSideOut;

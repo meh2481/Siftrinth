@@ -23,13 +23,13 @@ CubeBoard::CubeBoard()
 			m_bVWallSegments[j][i] = false;
 		}
 	}
-	m_bFirstCycle = true;
 	m_fAccumulatedArrowTime = 1.0f;
 	m_bShowingArrows = false;
 	m_iSideOut = -1;
 	m_iNumStars = 0;
 	m_fUpdateStars = 0.0f;
 	m_iCurStyle = 0;
+	m_vid.bg1.erase(Transparent);
 }
 
 CubeBoard::~CubeBoard()
@@ -55,7 +55,7 @@ bool CubeBoard::isHole()
 {
 	//Enable cheating by turning upside-down, just like real life
 	float accel = m_vid.physicalAccel().z;
-	if(accel > 0)//< 0)	//TODO
+	if(accel < 0)
 		return false;
 		
 	Int2 gridPos;
@@ -196,19 +196,6 @@ void CubeBoard::checkWallCollision(Float2 candidate)
 int CubeBoard::update(float fTimestep)
 {
 	int iReturn = BOARD_NOTHING;
-	if(m_bFirstCycle)	//HACK because of strange first-frame draw issues
-	{
-		m_bFirstCycle = false;
-		Int2 pos;
-		pos.set(0,1);
-		m_vid.bg0.setPanning(pos);
-	}
-	else
-	{
-		Int2 pos;
-		pos.set(0,0);
-		m_vid.bg0.setPanning(pos);
-	}	//HACK END
 	
 	if(m_bHasMarble)
 	{
@@ -497,6 +484,7 @@ void CubeBoard::init(CubeID cube)
 //Read in a random maze
 void CubeBoard::initTilemap()
 {
+	m_vid.bg1.erase(Transparent);
 	//If there are any portals, destroy them
 	for(int i = 0; i < 4; i++)
 	{
@@ -618,7 +606,7 @@ void CubeBoard::addMarble(Float2 pos, Float2 vel)
 	pos.y -= TILE_HEIGHT/2.0;
 	m_vid.sprites[0].move(pos);
 	m_marble.radius = MARBLE_RADIUS;
-	m_bFirstCycle = true;	//HACK
+	m_vid.bg1.erase(Transparent);
 }
 
 bool CubeBoard::touched(unsigned mySide, CubeBoard* other, unsigned otherSide, int iColor)
@@ -833,9 +821,10 @@ void CubeBoard::hideArrows()
 	if(!m_bShowingArrows)
 		return;
 	
-	BG1Mask mask;
-	mask.clear();
-	m_vid.bg1.setMask(mask);
+	//BG1Mask mask;
+	//mask.clear();
+	//m_vid.bg1.setMask(mask);
+	m_vid.bg1.erase(Transparent);
 	
 	m_bShowingArrows = false;
 }

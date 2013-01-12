@@ -1,9 +1,9 @@
 -- Metadata
-
 IconAssets = group{quality=9.95}
 Icon = image{"icon.png"}
 
 GameAssets = group{quality=9}
+--Images
 BackgroundTiles1 = image{"bgtiles-wood.png", width=8, height=8}
 PortalsL1 = image{"portalsl-wood.png", width=8, height=16, quality=10}
 PortalsR1 = image{"portalsr-wood.png", width=8, height=16, quality=10}
@@ -29,6 +29,9 @@ Star = image{"star.png", pinned=true, width=8, height=8}
 Arrows = image{"arrow.png", width=16, height=16}
 ArrowsRed = image{"arrowred.png", width=16, height=16}
 Font = image{"font.png", width=8, height=8}
+Transparent = image{"transparent.png", pinned=true}
+
+--Sounds
 sPortalEnter = sound{"portal_in.wav"}
 sPortalExit = sound{"portal_out.wav"}
 sThroughPortal = sound{"portal.wav"}

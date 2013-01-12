@@ -1,5 +1,3 @@
-Finish maps
-
 stretch goals:
 High score system
 music?
